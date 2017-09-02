@@ -17,26 +17,30 @@ const server = http.createServer();
 const file = {
     // ルート
     index: {
-        path: __dirname + '/public/index.html',
+        path: __dirname + '/public/index.ejs',
         code: 'utf-8',
     },
 };
+// 作ったテンプレートを読み込む
+const template = fs.readFileSync(file.index.path, file.index.code);
 
+// アクセス回数
+let number = 0;
 // サーバーにリクエストが来た際の処理定義
 // 参考：https://nodejs.org/api/http.html#http_http_createserver_requestlistener
 server.on('request', function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    fs.readFile(file.index.path, file.index.code, function (err, data) {
-        if (err) {
-            res.writeHead(404, {'Content-Type': 'text/plain'});
-            res.write('404 not found!');
-            return res.end();
-        }
+    if (req.url === '/favicon.ico') return true;
 
-        // ブラウザはEOFが発されるまでコネクションを繋げている証明を
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
+    number++;
+    // ejsのrenderメソッドで値を埋め込む
+    const data = ejs.render(template, {
+        title: 'Hello ejs !!!',
+        body: 'This is ejs',
+        number: number,
     });
+
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(data);
 });
 
 // サーバー起動
