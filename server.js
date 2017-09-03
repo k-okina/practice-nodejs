@@ -13,34 +13,47 @@ const settings = require('./settings');
 // httpモジュールにhttpサーバーモジュールを作成してもらう
 const server = http.createServer();
 
+const qs = require('querystring');
+
 // 読み込みファイル
 const file = {
     // ルート
     index: {
-        path: __dirname + '/public/index.ejs',
+        path: __dirname + '/public/bbs.ejs.html',
         code: 'utf-8',
     },
 };
 // 作ったテンプレートを読み込む
 const template = fs.readFileSync(file.index.path, file.index.code);
 
-// アクセス回数
-let number = 0;
+let posts = [];
+
+function renderForm(posts, res) {
+    const data = ejs.render(template, {
+        posts: posts,
+    });
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(data);
+}
 // サーバーにリクエストが来た際の処理定義
 // 参考：https://nodejs.org/api/http.html#http_http_createserver_requestlistener
 server.on('request', function (req, res) {
     if (req.url === '/favicon.ico') return true;
 
-    number++;
-    // ejsのrenderメソッドで値を埋め込む
-    const data = ejs.render(template, {
-        title: 'Hello ejs !!!',
-        body: 'This is ejs',
-        number: number,
-    });
-
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(data);
+    if (req.method === 'POST') {
+        req.data = '';
+        req.on('readable', function () {
+            req.data += req.read() || '';
+        });
+        req.on('end', () => {
+            const query = qs.parse(req.data);
+            console.log(query);
+            posts.push(query.name);
+            renderForm(posts, res);
+        });
+    } else {
+        renderForm(posts, res);
+    }
 });
 
 // サーバー起動

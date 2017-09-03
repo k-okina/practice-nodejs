@@ -4,9 +4,9 @@
   "description": "just practice nodejs",
   "main": "index.js",
   "dependencies": {
-    "ejs": "^2.5.7"
+    "ejs": "^2.5.7",
+    "mongodb": "^2.2.31"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
