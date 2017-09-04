@@ -17,7 +17,7 @@
         // emit: イベントを発信している
         // on: イベントを待ち受けている
         $('#my-form').submit(function (e) {
-            e.preventDefault();
+            e.preventDefault(); // リロードするイベントをキャンセルする
             socket.emit('emit_from_client', $('#msg').val());
         });
         socket.on('emit_from_server', function (data) {
